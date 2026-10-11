@@ -31,18 +31,41 @@ def Verlet(bodies, tf, ti, nSteps):
             
 
 
-def energy(state):
-    K = 0.5 * state.m * v**2
-    U = -(G * M * state.m) / r
-    E = K + U
+def energy(bodies):
+    K = 0
+    U = 0
+    for i in range(len(bodies)):
+        K += 0.5 * bodies[i].mass * np.dot(bodies[i].velocity, bodies[i].velocity)
+        for j in range(i+1, len(bodies)):
+            r = np.linalg.norm(bodies[j].position - bodies[i].position)
+            U += -1 * G * bodies[j].mass * bodies[i].mass / r
+    E = K+U
+    
     return K, U, E
 
 
-def radius(state):
-    return mag(state)
+def momentum(bodies):
+    p = np.array([0.0, 0.0])
+    for body in bodies:
+        p += body.velocity * body.mass
+    return p
 
 
-def speed(state):
-    return np.sqrt(state.vx**2 + state.vy**2)
+def centerOfMass(bodies):
+    M = 0
+    R = np.array([0.0, 0.0])
+    V = np.array([0.0, 0.0])
+    for body in bodies:
+        R += body.mass * body.position
+        V += body.mass * body.velocity
+        M += body.mass
+    return R/M, V/M
+
+def toCenterOfMassFrame(bodies):
+    rCM, vCM = centerOfMass(bodies)
+    for body in bodies:
+        body.position -= rCM
+        body.velocity -= vCM
+        
 
 
