@@ -11,7 +11,9 @@ bodies = [body1, body2]
 
 simulation.toCenterOfMassFrame(bodies)
 Rcom, Vcom = simulation.centerOfMass(bodies)
-print(f"Initial momentum: {simulation.momentum(bodies)}")
+print(f"Initial momentum: {np.linalg.norm(simulation.momentum(bodies))}")
+
+
 
 r1 = body1.position
 r2 = body2.position
@@ -85,7 +87,55 @@ plt.tight_layout()
 plt.savefig("Energies.png")
 plt.show()
 
-print("Initial energy:", E[0])
-print("Final energy:", E[-1])
-print("Maximum relative energy error:",
-      np.max(np.abs((E - E[0]) / E[0])))
+
+
+radius1 = np.linalg.norm(r1 - Rcom, axis=1)
+radius2 = np.linalg.norm(r2 - Rcom, axis=1)
+
+
+
+
+def measurePeriod(radius, t):
+    min = []
+    periapsis = []
+    apoapsis = []
+    for i in range(1, len(radius)-1):
+        if radius[i] < radius[i-1] and radius[i] <= radius[i+1]:
+            min.append(t[i])
+            periapsis.append(radius[i])
+        if radius[i] > radius[i-1] and radius[i] >= radius[i+1]:
+            apoapsis.append(radius[i])
+    periods = []
+    for i in range(len(min)-1):
+        periods.append(min[i+1] - min[i])
+    return np.mean(periods), np.mean(periapsis), np.mean(apoapsis)
+T1, per1, apo1 = measurePeriod(radius1, t)
+T2, per2, apo2 = measurePeriod(radius2, t)
+
+a1 = (per1 + apo1) / 2
+a2 = (per2 + apo2) / 2
+e1 = (apo1 - per1) / (per1 + apo1)
+e2 = (apo2 - per2) / (per2 + apo2)
+
+print(f"Body 1 period: {T1}")
+print(f"Body 2 period:{T2}")
+print(f"Expected Value:{T}")
+print(f"Difference between Body 1 period and expected value: {T - T1}")
+print(f"Difference between Body 2 period and expected value: {T - T2}")
+print(f"a1: {a1}, a2: {a2}, e1: {e1}, e2: {e2}")
+print(f"a1/a2: {a1 / a2}, m2/m1: {m2/m1}")
+
+
+
+RcomHistory = (m1*r1 + m2*r2) / (m1+m2)
+RcomDev = []
+for i in range(len(t)):
+        RcomDev.append(np.linalg.norm(RcomHistory[i] - RcomHistory[0]))
+plt.figure()
+plt.plot(t, RcomDev)
+plt.xlabel("Time")
+plt.ylabel("Center of Mass Deviation")
+plt.tight_layout()
+plt.savefig("CenterOfMass.png")
+plt.show()
+print("Maximum center of mass deviation:", np.max(RcomDev))
