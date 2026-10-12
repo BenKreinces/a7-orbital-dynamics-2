@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import TypeAlias, Dict, Union, List, Optional
 import numpy as np
 @dataclass
 
@@ -13,7 +12,7 @@ class body:
 
     def record(self):
         self.posHistory.append(self.position.copy())
-        self.velHistory.append(self.position.copy())
+        self.velHistory.append(self.velocity.copy())
 
 
 

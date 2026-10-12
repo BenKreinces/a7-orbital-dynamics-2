@@ -1,6 +1,4 @@
 import numpy as np
-import body
-from typing import TypeAlias, Dict, Union, List, Optional
 
 G = 1
 
@@ -15,7 +13,7 @@ def gravAccel(bodies):
     return accelerations
 
 def Verlet(bodies, tf, ti, nSteps):
-    h = (tf - ti)
+    h = (tf - ti) / nSteps
     for body in bodies:
         body.record()
     for _ in range(nSteps):
