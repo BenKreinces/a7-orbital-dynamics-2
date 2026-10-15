@@ -258,13 +258,10 @@ states = A6Simulation.Verlet(state, tf, ti, nSteps)
 
 x = []
 y = []
-
-
 h = (tf - ti) / nSteps
 for i, state in enumerate(states):
     x.append(state[0])
     y.append(state[1])
-
 relative = r2-r1
 fig, ax = plt.subplots()
 ax.set_xlim(-3, 3)
