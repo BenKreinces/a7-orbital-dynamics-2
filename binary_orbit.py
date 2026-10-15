@@ -125,8 +125,6 @@ print(f"Difference between Body 2 period and expected value: {T - T2}")
 print(f"a1: {a1}, a2: {a2}, e1: {e1}, e2: {e2}")
 print(f"a1/a2: {a1 / a2}, m2/m1: {m2/m1}")
 
-
-
 RcomHistory = (m1*r1 + m2*r2) / (m1+m2)
 RcomDev = []
 for i in range(len(t)):
@@ -138,4 +136,7 @@ plt.ylabel("Center of Mass Deviation")
 plt.tight_layout()
 plt.savefig("CenterOfMass.png")
 plt.show()
-print("Maximum center of mass deviation:", np.max(RcomDev))
+print(f"Maximum center of mass deviation: {np.max(RcomDev)}")
+print(f"Distance ratios (r1/r2), expected: {m2/m1}")
+for idx in np.linspace(0, len(t)-1, 16, dtype=int):
+    print(f"t={t[idx]:.4f}: r1/r2={radius1[idx]/radius2[idx]:.8f}")
