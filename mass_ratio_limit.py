@@ -2,6 +2,7 @@ import numpy as np
 from body import body
 import simulation
 import matplotlib.pyplot as plt
+
 G=1
 mH = 1
 mL = 1e-6
@@ -9,15 +10,21 @@ body11 = body(mH, (0.0, 0.0), (0.0, 0.8))
 body21 = body(mL, (1.0, 0.0), (0.0, 0.0)) 
 bodies = [body11, body21]
 
+print(f"Preliminary heavy velocity: {body11.velocity}")
+print(f"Preliminary light velocity: {body21.velocity}")
+
 simulation.toCenterOfMassFrame(bodies)
 Rcom, Vcom = simulation.centerOfMass(bodies)
 print(f"Initial momentum: {np.linalg.norm(simulation.momentum(bodies))}")
-
+print(f"Transformed heavy velocity: {body11.velocity}")
+print(f"Transformed light velocity: {body21.velocity}")
 r1 = body11.position
 r2 = body21.position
 
 v1 = body11.velocity
 v2 = body21.velocity
+
+
 
 rRel = r2 - r1
 vRel = v2 - v1
@@ -110,7 +117,20 @@ plt.show()
 print("Maximum center of mass deviation:", np.max(RcomDev))
 
 
+fig, ax = plt.subplots()
 
+ax.plot(r1[:, 0], r1[:, 1], label="Heavy body")
+ax.scatter(Rcom[0], Rcom[1], marker="x", label="Center of mass")
+
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.set_title("Elliptical: Heavy Body Close-up")
+ax.set_aspect("equal", adjustable="box")
+ax.legend()
+
+plt.tight_layout()
+plt.savefig("HeavyCloseupElliptical.png")
+plt.show()
 # Simulation 2
 vc = np.sqrt(G * (mH + mL) / d)
 body12 = body(mH, (0.0, 0.0), (0.0, 0.0)) 
@@ -214,3 +234,47 @@ plt.tight_layout()
 plt.savefig("CenterOfMass2.png")
 plt.show()
 print("Maximum center of mass deviation:", np.max(RcomDev))
+
+
+fig, ax = plt.subplots()
+ax.plot(r1[:,0], r1[:,1], label="Heavy body (circular)")
+ax.scatter(Rcom[0], Rcom[1], marker="x", label="Center of mass")
+ax.set(xlabel="x", ylabel="y", title="Circular: heavy-body close-up")
+ax.set_aspect("equal", adjustable="box")
+ax.legend()
+fig.savefig("HeavyCloseupCircular.png")
+plt.close(fig)
+
+
+import A6Simulation
+state = (1, 0, 0, 1, 0, 0)
+ti = 0
+Tc = 2 * np.pi
+tf = np.pi * 2 * 11
+nSteps = 10000
+state = A6Simulation.gravAccel(state)
+states = A6Simulation.Verlet(state, tf, ti, nSteps)
+
+
+x = []
+y = []
+
+
+h = (tf - ti) / nSteps
+for i, state in enumerate(states):
+    x.append(state[0])
+    y.append(state[1])
+
+relative = r2-r1
+fig, ax = plt.subplots()
+ax.set_xlim(-3, 3)
+ax.set_ylim(-3, 3)
+ax.set_aspect("equal", adjustable="box")
+ax.plot(relative[:,0], relative[:,1], label="Relative orbit")
+ax.plot(x, y, label="Fixed Center Orbit")
+ax.plot(0, 0, "o", label="Central mass")
+ax.set_xlabel("x")
+ax.set_ylabel("y")
+ax.legend()
+plt.show()
+fig.savefig("FixedCenterComparison.png")
